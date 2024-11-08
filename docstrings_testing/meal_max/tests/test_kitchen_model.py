@@ -84,7 +84,7 @@ def test_clear_meals(mock_cursor, mocker):
 
 def test_delete_meal_success(mock_cursor):
     """Test deleting a meal successfully."""
-    mock_cursor.fetchone.return_value = ([False])  # Meal is not deleted
+    mock_cursor.fetchone.return_value = [False]  # Meal is not deleted
     delete_meal(1)
 
     expected_select_sql = normalize_whitespace("SELECT deleted FROM meals WHERE id = ?")
@@ -107,7 +107,7 @@ def test_delete_meal_success(mock_cursor):
 
 def test_delete_meal_already_deleted(mock_cursor):
     """Test error raised when trying to delete an already deleted meal."""
-    mock_cursor.fetchone.return_value = ([True])  # Meal is already deleted
+    mock_cursor.fetchone.return_value = [True]  # Meal is already deleted
 
     with pytest.raises(ValueError, match="Meal with ID 1 has been deleted"):
         delete_meal(1)
@@ -186,7 +186,7 @@ def test_get_meal_by_name_already_deleted(mock_cursor):
 
 def test_update_meal_stats_win(mock_cursor):
     """Test updating meal stats for a win."""
-    mock_cursor.fetchone.return_value = ([False])  # Meal is not deleted
+    mock_cursor.fetchone.return_value = [False]  # Meal is not deleted
     update_meal_stats(1, "win")
 
     expected_query = "UPDATE meals SET battles = battles + 1, wins = wins + 1 WHERE id = ?"
@@ -209,7 +209,8 @@ def test_update_meal_stats_not_found(mock_cursor):
 
 def test_update_meal_stats_invalid_result(mock_cursor):
     """Test error raised when providing an invalid result."""
-    mock_cursor.fetchone.return_value = (1, "Pasta", "Italian", 15.99, "MED", False)
+    #mock_cursor.fetchone.return_value = (1, "Pasta", "Italian", 15.99, "MED", False)
+    mock_cursor.fetchone.return_value = [False]
 
     with pytest.raises(ValueError, match="Invalid result: banana. Expected 'win' or 'loss'."):
         update_meal_stats(1, "banana")
