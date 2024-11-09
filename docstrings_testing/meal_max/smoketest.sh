@@ -65,20 +65,19 @@ create_meal() {
   difficulty=$4
 
   echo "Adding meal ($meal - $cuisine, $price) to the meal class..."
-  response=$(curl -s -X POST "$BASE_URL/create-meal" -H "Content-Type: application/json" -d "{\"meal\":\"$meal\", \"cuisine\":$cuisine, \"price\":\"$price\", \"difficulty\":$difficulty\"}"| grep -q '"status": "success"')
+  response=$(curl -s -X POST "$BASE_URL/create-meal" \
+    -H "Content-Type: application/json" \
+    -d "{\"meal\":\"$meal\", \"cuisine\":\"$cuisine\", \"price\":$price, \"difficulty\":\"$difficulty\"}")
 
-  #http_code="${response: -3}"
-  #body="${response:0:${#response}-3}"
-    #echo "RESPONSE\" $response \"."
-  echo "$body" | grep -q '"status": "success"'
-  echo $response 
-  if [[ $$ -eq 0 ]]; then
+  if echo "$response" | grep -q '"status": "success"'; then
     echo "Meal added successfully."
   else
-    echo "Failed to add meal."
+    echo "Failed to add meal. Response: $response"
     exit 1
   fi
 }
+
+
 
 delete_meal(){
   meal_id=$1
@@ -142,6 +141,7 @@ get_meal_by_name() {
     exit 1
   fi
 }
+
 
 ############################################################
 #
