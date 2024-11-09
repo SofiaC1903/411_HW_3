@@ -38,7 +38,7 @@ def mock_cursor(mocker):
 def test_create_meal_success(mock_cursor):
     """Test creating a new meal successfully."""
 
-    create_meal(meal="Pasta", cuisine="Italian", price=15.99, difficulty="MED")
+    create_meal(meal="Hot Dog", cuisine="American", price=10.99, difficulty="MED")
 
     expected_query = normalize_whitespace("""
         INSERT INTO meals (meal, cuisine, price, difficulty)
@@ -48,27 +48,27 @@ def test_create_meal_success(mock_cursor):
 
     assert actual_query == expected_query, "The SQL query did not match the expected structure."
 
-    expected_args = ("Pasta", "Italian", 15.99, "MED")
+    expected_args = ("Hot Dog", "American", 10.99, "MED")
     actual_args = mock_cursor.execute.call_args[0][1]
     assert expected_args == actual_args, "Query arguments do not match."
 
 def test_create_meal_invalid_price():
     """Test error raised when creating a meal with an invalid price."""
     with pytest.raises(ValueError, match="Invalid price: -10. Price must be a positive number."):
-        create_meal(meal="Pasta", cuisine="Italian", price=-10, difficulty="MED")
+        create_meal(meal="Hot Dog", cuisine="American", price=-10, difficulty="MED")
 
 def test_create_meal_invalid_difficulty():
     """Test error raised when creating a meal with an invalid difficulty."""
     with pytest.raises(ValueError, match="Invalid difficulty level: EASY. Must be 'LOW', 'MED', or 'HIGH'."):
-        create_meal( meal="Pasta", cuisine="Italian", price=10.99, difficulty="EASY")
+        create_meal( meal="Hot Dog", cuisine="American", price=10.99, difficulty="EASY")
 
 def test_create_meal_duplicate(mock_cursor):
     """Test creating a meal with a duplicate meal."""
 
     mock_cursor.execute.side_effect = sqlite3.IntegrityError("UNIQUE constraint failed: meal.meal")
 
-    with pytest.raises(ValueError, match="Meal with name 'Pasta' already exists"):
-        create_meal(meal="Pasta", cuisine="Italian", price=10.99, difficulty="LOW")
+    with pytest.raises(ValueError, match="Meal with name 'Hot Dog' already exists"):
+        create_meal(meal="Hot Dog", cuisine="American", price=10.99, difficulty="LOW")
 
 def test_clear_meals(mock_cursor, mocker):
     """Test clearing the meals database."""
@@ -122,14 +122,14 @@ def test_delete_meal_not_found(mock_cursor):
 def test_get_leaderboard_success(mock_cursor):
     """Test retrieving the leaderboard successfully."""
     mock_cursor.fetchall.return_value = [
-        (1, "Pasta", "Italian", 15.99, "MED", 10, 8, 0.8),
-        (2, "Pizza", "Italian", 12.99, "LOW", 5, 3, 0.6)
+        (1, "Hot Dog", "American", 10.99, "MED", 10, 8, 0.8),
+        (2, "Rissotto", "Italian", 15.99, "LOW", 5, 3, 0.6)
     ]
 
     result = get_leaderboard(sort_by="wins")
     expected = [
-        {"id": 1, "meal": "Pasta", "cuisine": "Italian", "price": 15.99, "difficulty": "MED", "battles": 10, "wins": 8, "win_pct": 80.0},
-        {"id": 2, "meal": "Pizza", "cuisine": "Italian", "price": 12.99, "difficulty": "LOW", "battles": 5, "wins": 3, "win_pct": 60.0}
+        {"id": 1, "meal": "Hot Dog", "cuisine": "American", "price": 10.99, "difficulty": "MED", "battles": 10, "wins": 8, "win_pct": 80.0},
+        {"id": 2, "meal": "Rissotto", "cuisine": "Italian", "price": 15.99, "difficulty": "LOW", "battles": 5, "wins": 3, "win_pct": 60.0}
     ]
     assert result == expected, "Leaderboard results do not match."
 
@@ -140,10 +140,10 @@ def test_get_leaderboard_invalid_sort_by():
 
 def test_get_meal_by_id_success(mock_cursor):
     """Test retrieving a meal by ID successfully."""
-    mock_cursor.fetchone.return_value = (1, "Pasta", "Italian", 15.99, "MED", False)
+    mock_cursor.fetchone.return_value = (1, "Hot Dog", "American", 10.99, "MED", False)
 
     result = get_meal_by_id(1)
-    expected = Meal(1, "Pasta", "Italian", 15.99, "MED")
+    expected = Meal(1, "Hot Dog", "American", 10.99, "MED")
     assert result == expected, "Retrieved meal does not match the expected meal."
 
 def test_get_meal_by_id_not_found(mock_cursor):
@@ -155,7 +155,7 @@ def test_get_meal_by_id_not_found(mock_cursor):
 
 def test_get_meal_by_id_already_deleted(mock_cursor):
     """Test error raised when retrieving a meal that has already been deleted."""
-    mock_cursor.fetchone.return_value = (1, "Pasta", "Italian", 15.99, "MED", True)
+    mock_cursor.fetchone.return_value = (1, "Hot Dog", "American", 10.99, "MED", True)
     
     with pytest.raises(ValueError, match="Meal with ID 1 has been deleted"):
         get_meal_by_id(1)
@@ -163,30 +163,30 @@ def test_get_meal_by_id_already_deleted(mock_cursor):
 
 def test_get_meal_by_name_success(mock_cursor):
     """Test retrieving a meal by name successfully."""
-    mock_cursor.fetchone.return_value = (1, "Pasta", "Italian", 15.99, "MED", False)
+    mock_cursor.fetchone.return_value = (1, "Hot Dog", "American", 10.99, "MED", False)
 
-    result = get_meal_by_name("Pasta")
-    expected = Meal(1, "Pasta", "Italian", 15.99, "MED")
+    result = get_meal_by_name("Hot Dog")
+    expected = Meal(1, "Hot Dog", "American", 10.99, "MED")
     assert result == expected, "Retrieved meal does not match the expected meal."
 
 def test_get_meal_by_name_not_found(mock_cursor):
     """Test error raised when retrieving a meal by a non-existent name."""
     mock_cursor.fetchone.return_value = None
 
-    with pytest.raises(ValueError, match="Meal with name Pasta not found"):
-        get_meal_by_name("Pasta")
+    with pytest.raises(ValueError, match="Meal with name Hot Dog not found"):
+        get_meal_by_name("Hot Dog")
 
 def test_get_meal_by_name_already_deleted(mock_cursor):
     """Test error raised when retrieving a meal that has already been deleted."""
-    mock_cursor.fetchone.return_value = (1, "Pasta", "Italian", 15.99, "MED", True)
+    mock_cursor.fetchone.return_value = (1, "Hot Dog", "American", 10.99, "MED", True)
     
-    with pytest.raises(ValueError, match="Meal with name Pasta has been deleted"):
-        get_meal_by_name("Pasta")
+    with pytest.raises(ValueError, match="Meal with name Hot Dog has been deleted"):
+        get_meal_by_name("Hot Dog")
 
 
 def test_update_meal_stats_win(mock_cursor):
     """Test updating meal stats for a win."""
-    mock_cursor.fetchone.return_value = [False]  # Meal is not deleted
+    mock_cursor.fetchone.return_value = [False]  
     update_meal_stats(1, "win")
 
     expected_query = "UPDATE meals SET battles = battles + 1, wins = wins + 1 WHERE id = ?"
@@ -195,7 +195,7 @@ def test_update_meal_stats_win(mock_cursor):
 
 def test_update_meal_stats_already_deleted(mock_cursor):
     """Test error raised when updating meal stats for a meal that has already been deleted."""
-    mock_cursor.fetchone.return_value = (1, "Pasta", "Italian", 15.99, "MED", True)
+    mock_cursor.fetchone.return_value = (1, "Hot Dog", "American", 10.99, "MED", True)
     
     with pytest.raises(ValueError, match="Meal with ID 1 has been deleted"):
         update_meal_stats(1, "win")
@@ -209,7 +209,7 @@ def test_update_meal_stats_not_found(mock_cursor):
 
 def test_update_meal_stats_invalid_result(mock_cursor):
     """Test error raised when providing an invalid result."""
-    #mock_cursor.fetchone.return_value = (1, "Pasta", "Italian", 15.99, "MED", False)
+    
     mock_cursor.fetchone.return_value = [False]
 
     with pytest.raises(ValueError, match="Invalid result: banana. Expected 'win' or 'loss'."):
