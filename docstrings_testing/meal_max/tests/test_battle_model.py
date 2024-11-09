@@ -25,13 +25,13 @@ def mock_get_random(mocker):
 @pytest.fixture
 def meal_1():
     """fixture for a sample Meal object"""
-    return Meal(id=1, meal="Pasta", cuisine="Italian", price=12.99, difficulty="MED")
+    return Meal(id=1, meal="Mac and Cheese", cuisine="American", price=6.99, difficulty="LOW")
 
 
 @pytest.fixture
 def meal_2():
     """fixture for another sample Meal object"""
-    return Meal(id=2, meal="Burger", cuisine="American", price=9.99, difficulty="LOW")
+    return Meal(id=2, meal="Quesadillas", cuisine="Mexican", price=9.99, difficulty="LOW")
 
 
 @pytest.fixture
