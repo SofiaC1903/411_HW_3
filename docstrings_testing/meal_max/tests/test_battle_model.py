@@ -67,16 +67,16 @@ def test_get_combatants(prepared_battle):
     """test retrieving the list of combatants"""
     combatants = prepared_battle.get_combatants()
     assert len(combatants) == 2
-    assert combatants[0].meal == "Pasta"
-    assert combatants[1].meal == "Burger"
+    assert combatants[0].meal == "Mac and Cheese"
+    assert combatants[1].meal == "Quesadillas"
 
 def test_battle_success(prepared_battle, mock_get_random, mock_update_meal_stats):
     """test a successful battle between 2 meals"""
     winner = prepared_battle.battle()
-    assert winner in ["Pasta", "Burger"], "Winner should be one of the combatants."
+    assert winner in ["Mac and Cheese", "Quesadillas"], "Winner should be one of the combatants."
 
-    mock_update_meal_stats.assert_any_call(1 if winner == "Pasta" else 2, "win")
-    mock_update_meal_stats.assert_any_call(2 if winner == "Pasta" else 1, "loss")
+    mock_update_meal_stats.assert_any_call(1 if winner == "Mac and Cheese" else 2, "win")
+    mock_update_meal_stats.assert_any_call(2 if winner == "Mac and Cheese" else 1, "loss")
 
     assert len(prepared_battle.combatants) == 1
     assert prepared_battle.combatants[0].meal == winner
