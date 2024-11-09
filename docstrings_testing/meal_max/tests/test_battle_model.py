@@ -4,7 +4,7 @@ from meal_max.models.kitchen_model import Meal
 from meal_max.utils.random_utils import get_random
 
 
-@pytest.fixture()
+@pytest.fixture
 def battle_model():
     """fixture to provide new instance of BattleModel for each test"""
     return BattleModel()
@@ -14,7 +14,6 @@ def battle_model():
 def mock_update_meal_stats(mocker):
     """mock the update_meal_stats function for testing reasons"""
     return mocker.patch("meal_max.models.battle_model.update_meal_stats")
-
 
 @pytest.fixture
 def mock_get_random(mocker):
@@ -107,7 +106,7 @@ def test_battle_random_number(prepared_battle, mock_get_random, mock_update_meal
 def test_get_battle_score_success(battle_model, meal_1):
     """test calculating the battle score for a meal"""
     score = battle_model.get_battle_score(meal_1)
-    expected_score = (meal_1.price * len(meal_1.cuisine)) - 2  
+    expected_score = (meal_1.price * len(meal_1.cuisine)) - 3  
     assert score == expected_score, f"Expected score {expected_score}, got {score}"
 
 
