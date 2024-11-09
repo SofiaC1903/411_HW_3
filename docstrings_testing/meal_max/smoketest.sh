@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the base URL for the Flask API
-BASE_URL="http://localhost:5000/api"
+BASE_URL="http://localhost:5001/api"
 
 # Flag to control whether to echo JSON output
 ECHO_JSON=false
@@ -128,16 +128,16 @@ get_meal_by_id() {
 get_meal_by_name() {
   meal_name=$1
 
-  echo "Getting meal by name (Meal: '$meal_name')..."
-  response=$(curl -s -X GET "$BASE_URL/get-meal-by-name?meal_name=$(echo $meal_name | sed 's/ /%20/g')")
+  echo "Getting meal by its name of: ($meal_name)..."
+  response=$(curl -s -X GET "$BASE_URL/get-meal-by-name/$meal_name")
   if echo "$response" | grep -q '"status": "success"'; then
-    echo "Meal retrieved successfully by name."
+    echo "Meal gotten successfully by name ($meal_name). Congrats!"
     if [ "$ECHO_JSON" = true ]; then
-      echo "Meal JSON (by name):"
+      echo "Meal JSON (ID $meal_name):"
       echo "$response" | jq .
     fi
   else
-    echo "Failed to get meal by name."
+    echo "Failure to get meal by name ($meal_name)."
     exit 1
   fi
 }
@@ -193,17 +193,23 @@ get_combatants() {
   fi
 }
 
-prep_combatant() {
-  echo "Preparing a meal to becoma a combatant in battle..."
-  response=$(curl -s -X POST "$BASE_URL/prep-combatant")
 
-  if echo "$response" | grep -q '"status":'; then
+prep_combatant() {
+  meal_name=$1
+  echo "Preparing meal ($meal_name) to become a combatant in battle..."
+
+  response=$(curl -s -X POST "$BASE_URL/prep-combatant" \
+    -H "Content-Type: application/json" \
+    -d "{\"meal\": \"$meal_name\"}")  
+
+  if echo "$response" | grep -q '"status": "success"'; then
     echo "Prepared combatant successfully."
   else
     echo "Failed to prepare combatant"
     exit 1
   fi
 }
+
 
 # Health checks
 check_health
@@ -212,25 +218,29 @@ check_db
 # Clear the catalog
 clear_catalog
 
-# Create songs
+# Create meals
 create_meal "Casserole" "American" 8.99 "HIGH" 
 create_meal "Lasagna" "Italian" 12.99 "LOW" 
-create_meal "Tacos Al Pastor" "Mexican" 9.99 "HIGH" 
-create_meal "Fish Sticks" "American" 5.99 "LOW" 
-create_meal "Chicken Quesadillas" "Mexican" 10.99 "MED" 
-
-delete_meal 1
-get_leaderboard
+create_meal "Tacos" "Mexican" 9.99 "HIGH" 
+create_meal "Burger" "American" 5.99 "LOW" 
+create_meal "Quesadillas" "Mexican" 10.99 "MED" 
 
 get_meal_by_id 2
 get_meal_by_id 4
 get_meal_by_name "Casserole"
-get_meal_by_name "Fish Sticks"
+get_meal_by_name "Burger"
+
+delete_meal 3
+
+get_leaderboard
+
+prep_combatant "Casserole"
+prep_combatant "Burger"
 
 battle
 
-prep_combatant
 get_combatants
 clear_combatants
+
 
 echo "All tests passed successfully!"
